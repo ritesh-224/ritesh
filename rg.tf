@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.35.0"
+      version = "4.35.0"
     }
   }
 }
@@ -18,7 +18,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_storage_account" "stg" {
-  name = "my-stg"
+  name = "pipelinestorage"
   location = azurerm_resource_group.example.location
   resource_group_name" = azurerm_resource_group.example.name
   account_tier = "Standard"
