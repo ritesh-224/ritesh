@@ -33,4 +33,13 @@ resource "azurerm_linux_virtual_machine" "example" {
     sku       = "22_04-lts"
     version   = "latest"
   }
+
+  custom_data = base64encode(<<-EOF
+              #!/bin/bash
+              apt-get update -y
+              apt-get install nginx -y
+              systemctl start nginx
+              systemctl enable nginx
+            EOF
+  )
 }
