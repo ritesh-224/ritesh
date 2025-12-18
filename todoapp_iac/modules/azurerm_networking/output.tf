@@ -8,7 +8,3 @@ output "subnet_ids" {
     }
   }
 }
-
-# output "subnet_ids" {
-#   value = { for s in azurerm_virtual_network.vnet.subnet : s.name => s.id }
-# }
