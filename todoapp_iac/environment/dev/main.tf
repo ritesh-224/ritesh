@@ -23,14 +23,14 @@ module "key_vault" {
 
 module "secrets" {
     depends_on = [ module.key_vault ]
-    source       = "../../modules/azurerm_secrets"
+    source       = "../../modules/azurerm_key_vault_secrets"
     secrets      = var.secrets
     key_vault_name = module.key_vault.key_vault_name
     rg_name        = "test"
 }
 
 module "virtual_machines" {
-    depends_on = [module.networks, module.public_ips, module.key_vault, module.secrets]
+    depends_on = [module.networks, module.public_ips, module.key_vault]
     source = "../../modules/azurerm_virtual_machine"
     vms = var.vms
 }
