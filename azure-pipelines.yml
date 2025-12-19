@@ -1,0 +1,83 @@
+trigger: none
+
+pool: default
+
+stages:
+- stage: 'terraforminitplan'
+  displayName: 'Generate_Plan'
+  jobs:
+    - job: initialize
+      displayName: 'terraform init'
+      steps:
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/resource/infra'
+          backendServiceArm: 'azureconnection'
+          backendAzureRmResourceGroupName: 'rvrg'
+          backendAzureRmStorageAccountName: 'rvsg'
+          backendAzureRmContainerName: 'rvcontainer'
+          backendAzureRmKey: 'terraform.tfstate'
+
+    - job: plan
+      displayName: 'terraform plan'
+      steps:
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/resource/infra'
+          environmentServiceNameAzureRM: 'azureconnection'
+
+- stage: 'code_quality_test'
+  displayName: 'code quality test'
+  jobs:
+    - job: 'tflint'
+      displayName: 'tflint scan'
+      steps:
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
+            Write-Host "running tflint scan"
+            Set-Location resource
+            tflint --version
+            tflint --init
+            tflint --recursive
+          errorActionPreference: 'continue'
+
+    - job: 'tfsec'
+      displayName: 'tfsec scan'
+      steps:
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
+            Write-Host "running tfsec scan"
+            Set-Location resource
+            tfsec .
+          errorActionPreference: 'continue'
+
+- stage: apply
+  displayName: 'infrastructure creation'
+  jobs:
+    - job: apply
+      displayName: 'terraform apply'
+      steps:
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/resource/infra'
+          backendServiceArm: 'azureconnection'
+          backendAzureRmResourceGroupName: 'rvrg'
+          backendAzureRmStorageAccountName: 'rvsg'
+          backendAzureRmContainerName: 'rvcontainer'
+          backendAzureRmKey: 'terraform.tfstate'
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/resource/infra'
+          environmentServiceNameAzureRM: 'azureconnection'
