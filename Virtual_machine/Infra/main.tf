@@ -68,7 +68,7 @@ module "bastion" {
 module "azure_vm1" {
   depends_on = [ module.subnet, module.password, module.resource_group, module.virtual_network ]
   source              = "../Module/azure_vm"
-  vm_prefix             = "motu-vm1"
+  vm_prefix             = "test-vm-1"
   location            = "East US"
   rg_name             = "motu-rg"
   nic_prefix          = "vm1"
@@ -81,7 +81,7 @@ module "azure_vm1" {
 
 module "azure_vm2" {
   source              = "../Module/azure_vm"
-  vm_prefix             = "motu-vm2"
+  vm_prefix             = "test-vm-2"
   location            = "East US"
   rg_name             = "motu-rg"
   nic_prefix          = "vm2"
